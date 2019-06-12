@@ -1,6 +1,6 @@
 package com.knoldus.akka
 import akka.actor.{ActorRef, ActorSystem}
-import com.knoldus.DB.DBConnection
+import com.knoldus.DB.{DBConnection, UserClickDBLayer, UserClickDBService}
 import com.knoldus.akka.UserClicked.UserData
 import com.knoldus.akka.UserDetails.UserDetailData
 import com.knoldus.common.User
@@ -21,7 +21,10 @@ object ActorSystems extends App {
 
   val system: ActorSystem = ActorSystem("Akka-kafka")
 
-  val userClickedActor: ActorRef = system.actorOf(UserClicked.props(consumer,dbConnection), "userClickedActor")
+  val userClickDb  = new UserClickDBLayer
+  val userClick = new UserClickDBService(dbConnection,userClickDb)
+
+  val userClickedActor: ActorRef = system.actorOf(UserClicked.props(consumer,dbConnection,userClick), "userClickedActor")
 
   val userDetailActor: ActorRef = system.actorOf(UserDetails.props(consumer,dbConnection), "userDetailActor")
 
